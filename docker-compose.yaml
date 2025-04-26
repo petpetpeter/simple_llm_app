@@ -1,0 +1,48 @@
+services:
+  ollama:
+    image: ollama/ollama
+    ports:
+      - "5000:11434"
+    volumes:
+      - ollama:/root/.ollama
+    restart: always
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+
+  fastapi:
+    build:
+      context: .
+    image: pyapp:latest
+    container_name: fastapi-app
+    command: uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+
+    volumes:
+      - ./app.py:/app/app.py
+    ports:
+      - "5001:8000"
+
+  streamlit:
+    build:
+      context: .
+    image: pyapp:latest
+    container_name: streamlit-app
+    command: streamlit run ui.py --server.port 8501 --server.address 0.0.0.0
+    volumes:
+      - ./ui.py:/app/ui.py
+    ports:
+      - "5002:8501"
+    
+  busybox:
+    image: busybox
+    command: sleep 3600
+
+volumes:
+  ollama:
+
+networks:
+  default:
+    name: app-network
+    driver: bridge

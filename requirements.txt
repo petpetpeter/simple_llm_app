@@ -1,3 +1,10 @@
-fastapi
+fastapi[standard]
 uvicorn
 streamlit
+pymongo
+faiss-cpu
+sentence-transformers
+
+
+colorlog
+opensearch-py
